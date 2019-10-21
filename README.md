@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # FIFA VAE 
 
 This repository contains an implementation of a Variational Autoencoder 
@@ -99,3 +100,6 @@ Generate average players for each of the given countries.
 
 
 
+=======
+# VAE-for-de-novo-drug-design
+>>>>>>> ac76da392712eb1bd8d62ea2fcd1fb0fb44d5472
