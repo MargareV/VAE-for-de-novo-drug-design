@@ -62,36 +62,43 @@ x_decoded_relu = decoder_deconv3_upsamp(deconv_2_decoded)
 x_decoded_mean_squash = decoder_mean_squash(x_decoded_relu)
 
 # defining loss layer
-class CustomVariationalLayer(Layer):
-    def __init__(self, **kwargs):
-        self.is_placeholder = True
-        super(CustomVariationalLayer, self).__init__(**kwargs)
+#class CustomVariationalLayer(Layer):
+#    def __init__(self, **kwargs):
+#        self.is_placeholder = True
+#       super(CustomVariationalLayer, self).__init__(**kwargs)
 
-    def vae_loss(self, x, x_decoded_mean_squash):
+#    def vae_loss(self, x, x_decoded_mean_squash):
+#        x = K.flatten(x)
+#        x_decoded_mean_squash = K.flatten(x_decoded_mean_squash)
+#        xent_loss = img_rows * img_cols * metrics.binary_crossentropy(x, x_decoded_mean_squash)
+#        kl_loss = - 0.5 * K.mean(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
+#        return K.mean(xent_loss + kl_loss)
+
+#    def call(self, inputs):
+#        x = inputs[0]
+#        x_decoded_mean_squash = inputs[1]
+#        loss = self.vae_loss(x, x_decoded_mean_squash)
+#        self.add_loss(loss, inputs=inputs)
+#        return x
+
+#y = CustomVariationalLayer()([x, x_decoded_mean_squash])
+
+def vae_loss(x, x_decoded_mean_squash):
         x = K.flatten(x)
         x_decoded_mean_squash = K.flatten(x_decoded_mean_squash)
         xent_loss = img_rows * img_cols * metrics.binary_crossentropy(x, x_decoded_mean_squash)
         kl_loss = - 0.5 * K.mean(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
         return K.mean(xent_loss + kl_loss)
 
-    def call(self, inputs):
-        x = inputs[0]
-        x_decoded_mean_squash = inputs[1]
-        loss = self.vae_loss(x, x_decoded_mean_squash)
-        self.add_loss(loss, inputs=inputs)
-        return x
-
-y = CustomVariationalLayer()([x, x_decoded_mean_squash])
-
 # entire model
-vae = Model(x, y)
-vae.compile(optimizer='rmsprop', loss=None)
+vae = Model(x, x_decoded_mean_squash)
+vae.compile(optimizer='rmsprop', loss=vae_loss)
 vae.summary()
 
 datagen = ImageDataGenerator()
 
-train_set = datagen.flow_from_directory('/home/margs/Drug dicovery and machine learning/Images_zinc/Train', target_size=(300, 300))
-validation_set = datagen.flow_from_directory('/home/margs/Drug dicovery and machine learning/Images_zinc/validation', target_size=(300, 300))
+train_set = datagen.flow_from_directory('/home/margs/Drug dicovery and machine learning/Images_zinc/Train', target_size=(300, 300), shuffle=True)
+validation_set = datagen.flow_from_directory('/home/margs/Drug dicovery and machine learning/Images_zinc/validation', target_size=(300, 300), shuffle=True)
 
 # training
 history = vae.fit_generator(train_set,
