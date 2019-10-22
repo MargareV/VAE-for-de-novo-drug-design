@@ -38,7 +38,7 @@ class VAE:
             x = tf.layers.conv2d(x, filters=64, kernel_size=4, strides=2, padding='same', activation=activation)
             x = tf.layers.conv2d(x, filters=64, kernel_size=4, strides=2, padding='same', activation=activation)
             x = tf.layers.conv2d(x, filters=64, kernel_size=4, strides=1, padding='same', activation=activation)
-            #x = tf.layers.conv2d(x, filters=64, kernel_size=4, strides=1, padding='same', activation=activation)
+            x = tf.layers.conv2d(x, filters=64, kernel_size=4, strides=1, padding='same', activation=activation)
             x = tf.layers.flatten(x)
 
             # Local latent variables
@@ -61,8 +61,8 @@ class VAE:
             recovered_size = int(np.sqrt(self.inputs_decoder/3))
 
             x = tf.reshape(x, [-1, recovered_size, recovered_size, 3])
-            #x = tf.layers.conv2d_transpose(x, filters=64, kernel_size=4, strides=1, padding='same',
-            #                               activation=activation)
+            x = tf.layers.conv2d_transpose(x, filters=64, kernel_size=4, strides=1, padding='same',
+                                           activation=activation)
             x = tf.layers.conv2d_transpose(x, filters=64, kernel_size=4, strides=1, padding='same',
                                            activation=activation)
             x = tf.layers.conv2d_transpose(x, filters=64, kernel_size=4, strides=1, padding='same',
