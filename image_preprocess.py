@@ -1,46 +1,52 @@
-from __future__ import print_function
-import numpy as np
+import os
+from keras.preprocessing import image as image_utils
+from PIL import Image
+from PIL import ImageFilter
 import matplotlib.pyplot as plt
-from scipy.stats import norm
-from keras.layers import Input, Dense, Lambda, Flatten, Reshape, Layer
-from keras.layers import Conv2D, Conv2DTranspose
-from keras.models import Model
-from keras import backend as K
-from keras import metrics
-from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
-from keras.callbacks import ModelCheckpoint
+import numpy as np
+import pickle
 
-#K.set_image_data_format('channels_first')
+inp_dir = '/home/margs/Drug dicovery and machine learning/Images_zinc/Train'
+target_size = (300, 300)
 
-#print("Image data format: ", K.image_data_format())
-#print("Image dimension ordering: ", K.image_data_format())
-print("Backend: ", K.backend())
+classes = os.listdir(inp_dir)
+all_images = []
+all_labels = []
+
+i = 0
+for idx, c in enumerate(classes):
+    img_list = os.listdir(inp_dir + '/' + '12170(80%)')
+    print(idx)
+    j = 0
+    for img in img_list:
+        fname = inp_dir + '/' + '12170(80%)' + '/' + img
+        image = image_utils.load_img(fname).resize(target_size,Image.ANTIALIAS)
+        image = np.array(image.getdata()).reshape(target_size[0], target_size[1], 3)
+        image = image.astype('float32')/255
+        all_images.append(image)
+        all_labels.append(idx)
+        #j += 1
+        #if j >= 20:
+        #    break
+        #plt.imshow(image)
+        #plt.show()
+    #i += 1
+    #if i >= 50:
+    #    break
 
 
+all_images = np.array(all_images)
+all_labels = np.array(all_labels)
 
-# input image dimensions
-img_rows, img_cols, img_chns = 300, 300, 3
-# number of convolutional filters to use
-filters = 64
-# convolution kernel size
-num_conv = 3
+print(all_images.shape)
+print(all_labels.shape)
 
-batch_size = 2
-#if K.image_data_format() == 'channels_first':
-#    original_img_size = (img_chns, img_rows, img_cols)
-#else:
-#    original_img_size = (img_rows, img_cols, img_chns)
+np.save('full_x', all_images)
+np.save('full_y', all_labels)
 
-original_img_size = (img_rows, img_cols, img_chns)
-    
-latent_dim = 15
-intermediate_dim = 2
-epsilon_std = 1.0
-epochs = 20
 
-print("Original image size: ", original_img_size)
-
-# encoder network
+'''
+IGNORE THIS!! THIS IS THE CODE FOR THE MODEL. IT'S NOW AVAILABLE IN keras_VAE.py
 x = Input(shape=original_img_size)
 conv_1 = Conv2D(img_chns,
                 kernel_size=(2, 2),
@@ -157,24 +163,4 @@ vae = Model(x, y)
 
 vae.compile(optimizer='rmsprop', loss=None, metrics=['accuracy'])
 vae.summary()
-
-history = vae.fit(x_train,
-        shuffle=True,
-        epochs=epochs,
-        batch_size=batch_size,
-        validation_freq=1
-        )
-# encoder from learned model
-encoder = Model(x, z_mean)
-
-# generator / decoder from learned model
-decoder_input = Input(shape=(latent_dim,))
-_hid_decoded = decoder_hid(decoder_input)
-_up_decoded = decoder_upsample(_hid_decoded)
-_reshape_decoded = decoder_reshape(_up_decoded)
-_deconv_1_decoded = decoder_deconv_1(_reshape_decoded)
-_deconv_2_decoded = decoder_deconv_2(_deconv_1_decoded)
-_x_decoded_relu = decoder_deconv_3_upsamp(_deconv_2_decoded)
-_x_decoded_mean_squash = decoder_mean_squash(_x_decoded_relu)
-generator = Model(decoder_input, _x_decoded_mean_squash)
-
+#working code'''
